@@ -11,10 +11,11 @@ SamplerState g_sampler : register(s0); //サンプラー
 cbuffer global
 {
     //変換行列、視点、光源
-    float4x4 matWVP; // ワールド・ビュー・プロジェクションの合成行列
-    float4x4 matW;  //法線をワールド座標に対応させる行列＝回転＊
-    float4 diffuseColor; //拡散反射係数
-    bool isTextured; //texが貼られているか
+    float4x4 matWVP;        // ワールド・ビュー・プロジェクションの合成行列
+    float4x4 matW;          //法線をワールド座標に対応させる行列＝回転＊
+    float4   diffuseColor;  //拡散反射係数
+    float2   factor;        //diffuseFactor
+    bool     isTextured;    //texが貼られているか
 };
 
 //───────────────────────────────────────
@@ -64,14 +65,21 @@ float4 PS(VS_OUT inData) : SV_Target
     float4 Kd = g_texture.Sample(g_sampler, inData.uv);
     float cos_alpha = inData.cos_alpha;
     float4 ambentSource = { 0.5, 0.5, 0.5, 1.0 };//環境光の強さ
+    float4 diffuse;
+    float4 ambient;
     
     if (isTextured == false)
     {
-        return Id * diffuseColor * cos_alpha + Id * diffuseColor * ambentSource;
+       // return Id * diffuseColor * cos_alpha + Id * diffuseColor * ambentSource;
+        diffuse = diffuseColor * inData.cos_alpha * factor.x;
+        ambient = diffuseColor * ambentSource * factor.x;
     }
     else
     {
-        return Id * Kd * cos_alpha + Id * Kd * ambentSource;
+        //return Id * Kd * cos_alpha + Id * Kd * ambentSource;
+        diffuse = g_texture.Sample(g_sampler, inData.uv) * inData.cos_alpha * factor.x;
+        ambient = g_texture.Sample(g_sampler, inData.uv) * ambentSource * factor.x;
     }
     //return g_texture.Sample(g_sampler, myUv);
+    return diffuseColor + ambient;
 }

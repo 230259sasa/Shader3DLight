@@ -10,7 +10,7 @@ TestScene::TestScene(GameObject* parent)
 
 void TestScene::Initialize()
 {
-	hModel_ = Model::Load("Assets/pp.fbx");
+	hModel_ = Model::Load("Assets/ss.fbx");
 }
 
 void TestScene::Update()

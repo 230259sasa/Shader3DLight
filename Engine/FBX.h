@@ -18,13 +18,15 @@ class FBX
 	{
 		Texture* pTexture;
 		XMFLOAT4 diffuse;
+		XMFLOAT2 factor;
 	};
 	//コンスタントバッファー:　アプリ側から、シェーダーに毎フレーム渡したい情報
 	struct CONSTANT_BUFFER
 	{
 		XMMATRIX	matWVP;
 		XMMATRIX	matNormal;
-		XMFLOAT4 diffuseColor;
+		XMFLOAT4	diffuseColor;
+		XMFLOAT2	diffuseFactor;
 		int isTextured;
 	};
 
