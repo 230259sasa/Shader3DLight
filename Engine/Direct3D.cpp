@@ -1,7 +1,7 @@
 #include <d3dcompiler.h>
+#include <assert.h>
 #include "Direct3D.h"
-#include <DirectXMath.h>
-
+#include<DirectXMath.h>
 
 //変数
 namespace Direct3D
@@ -26,6 +26,7 @@ namespace Direct3D
 		ID3D11RasterizerState* pRasterizerState = nullptr;	//ラスタライザー
 	};
 	SHADER_BUNDLE shaderBundle[SHADER_MAX];
+	XMFLOAT4 G_LightVec = { 0,1,-1,0 };
 }
 
 
@@ -319,4 +320,15 @@ void Direct3D::Release()
 	SAFE_RELEASE(pSwapChain);
 	SAFE_RELEASE(pContext);
 	SAFE_RELEASE(pDevice);
+}
+
+
+void Direct3D::SetGlobalLightVec(XMFLOAT4 lv)
+{
+	G_LightVec = lv;
+}
+
+XMFLOAT4 Direct3D::GetGlobalLightVec()
+{
+	return G_LightVec;
 }

@@ -249,6 +249,7 @@ void FBX::Draw(Transform& transform)
 		cb.diffuseColor = pMaterialList_[i].diffuse;
 		cb.diffuseFactor = pMaterialList_[i].factor;
 		cb.isTextured = (pMaterialList_[i].pTexture != nullptr);
+		cb.globalLightVec = Direct3D::GetGlobalLightVec();
 		/*if (pMaterialList_[i].pTexture == nullptr) {
 			cb.isTextured = false;
 		}

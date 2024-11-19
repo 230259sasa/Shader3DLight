@@ -26,6 +26,7 @@ class FBX
 		XMMATRIX	matWVP;
 		XMMATRIX	matNormal;
 		XMFLOAT4	diffuseColor;
+		XMFLOAT4	globalLightVec;
 		XMFLOAT2	diffuseFactor;
 		int isTextured;
 	};
