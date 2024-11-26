@@ -4,7 +4,8 @@
 #include<DirectXMath.h>
 
 enum SHADER_TYPE {
-	SHADER_2D,SHADER_3D,SHADER_MAX
+	SHADER_2D,SHADER_3D,
+	SHADER_POINT,SHADER_MAX
 };
 //ƒŠƒ“ƒJ
 #pragma comment(lib, "d3d11.lib")
@@ -24,6 +25,7 @@ namespace Direct3D
 	HRESULT InitShader();
 	HRESULT InitShader3D();
 	HRESULT InitShader2D();
+	HRESULT InitPointLightShader();
 	void SetShader(SHADER_TYPE type);
 	//•`‰æŠJŽn
 	void BeginDraw();

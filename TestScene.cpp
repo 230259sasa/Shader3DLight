@@ -10,7 +10,8 @@ TestScene::TestScene(GameObject* parent)
 
 void TestScene::Initialize()
 {
-	hModel_ = Model::Load("Assets/ss.fbx");
+	hModel_[0] = Model::Load("Assets/ss.fbx");
+	hModel_[1] = Model::Load("Assets/ps.fbx");
 }
 
 void TestScene::Update()
@@ -20,8 +21,13 @@ void TestScene::Update()
 
 void TestScene::Draw()
 {
-	Model::SetTransform(hModel_,transform_);
-	Model::Draw(hModel_);
+	Transform t;
+	t = transform_;
+	for (int i = 0; i < 2; i++) {
+		t.position_.x += 2 * i;
+		Model::SetTransform(hModel_[i], t);
+		Model::Draw(hModel_[i]);
+	}
 }
 
 void TestScene::Release()

@@ -107,6 +107,9 @@
     <ClInclude Include="Engine\Transform.h">
       <Filter>ソース ファイル\Engine</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Engine\Simple2D.hlsl">
@@ -115,8 +118,16 @@
     <FxCompile Include="Engine\Simple3D.hlsl">
       <Filter>ソース ファイル\Engine</Filter>
     </FxCompile>
+    <FxCompile Include="PointLight.hlsl">
+      <Filter>ソース ファイル\Engine</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Shader241114.rc">
+      <Filter>リソース ファイル</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
