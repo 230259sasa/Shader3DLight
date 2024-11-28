@@ -26,7 +26,7 @@ struct VS_OUT
 {
     float4 pos : SV_POSITION; //位置
     float2 uv : TEXCOORD; //UV座標
-    float4 cos_alpha : COLOR; //色（明るさ）
+    float4 color : COLOR; //色（明るさ）
 };
 
 //───────────────────────────────────────
@@ -43,15 +43,15 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
     outData.uv = uv;
     
     //float4 light = float4(1, 1, -1, 0); //光源ベクトルの逆ベクトル
-    float4 light = lightVec;
-    light = normalize(light); //単位ベクトル化
-
     normal = mul(normal, matW);
-    normal = normalize(normal);
     normal.w = 0;
-    light.w = 0;
+    normal = normalize(normal);
     
-    outData.cos_alpha = clamp(dot(normal, light), 0, 1);
+    float4 light = lightVec - outData.pos;
+    light = normalize(light); //単位ベクトル化
+    
+    outData.color = clamp(dot(normal, light), 0, 1);
+    //outData.color = normal;
 	//まとめて出力
     return outData;
 }
@@ -64,23 +64,21 @@ float4 PS(VS_OUT inData) : SV_Target
     float4 ambentSource = { 0.5, 0.5, 0.5, 1.0 }; //環境光の強さ
     float4 diffuse;
     float4 ambient;
-    float4 dir;
     
-    dir = lightVec - inData.pos;
-    dir *= -1;
-    ambentSource = saturate(dot(normalize(inData.cos_alpha), dir));
+    //float4 light = lightVec - inData.pos;
+    //light = normalize(light); //単位ベクトル化
+    //ambentSource = clamp(dot(inData.color, light), 0, 1);
+    ambentSource = inData.color;
     
     if (isTextured == false)
     {
-        diffuse = diffuseColor * inData.cos_alpha * factor.x;
+        diffuse = diffuseColor * inData.color * factor.x;
         ambient = diffuseColor * ambentSource * factor.x;
     }
     else
     {
-        diffuse = g_texture.Sample(g_sampler, inData.uv) * inData.cos_alpha * factor.x;
+        diffuse = g_texture.Sample(g_sampler, inData.uv) * inData.color * factor.x;
         ambient = g_texture.Sample(g_sampler, inData.uv) * ambentSource * factor.x;
     }
     return diffuseColor + ambient;
-    
-    
 }

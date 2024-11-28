@@ -3,7 +3,7 @@
 class TestScene :
     public GameObject
 {
-    int hModel_[2];
+    int hModel_[3];
 public:
     TestScene(GameObject* parent);
     void Initialize() override;
