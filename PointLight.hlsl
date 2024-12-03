@@ -61,14 +61,20 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
 //───────────────────────────────────────
 float4 PS(VS_OUT inData) : SV_Target
 {
-    float4 ambentSource = { 0.5, 0.5, 0.5, 1.0 }; //環境光の強さ
+    //float4 ambentSource = { 0.5, 0.5, 0.5, 1.0 }; //環境光の強さ
     float4 diffuse;
     float4 ambient;
+    float4 dir = lightVec - inData.pos;
+    float len = length(dir);
+    dir = normalize(dir);
+    float col = saturate(dot(normalize(inData.pos), dir))
+    * saturate(1.0f / (1.0f + 1.0f * len + 1.0f * len * len));
+    float4 ambentSource = { col, col, col, 1.0 }; //環境光の強さ
     
     //float4 light = lightVec - inData.pos;
     //light = normalize(light); //単位ベクトル化
     //ambentSource = clamp(dot(inData.color, light), 0, 1);
-    ambentSource = inData.color;
+    //ambentSource = inData.color;
     
     if (isTextured == false)
     {
@@ -80,5 +86,5 @@ float4 PS(VS_OUT inData) : SV_Target
         diffuse = g_texture.Sample(g_sampler, inData.uv) * inData.color * factor.x;
         ambient = g_texture.Sample(g_sampler, inData.uv) * ambentSource * factor.x;
     }
-    return diffuseColor + ambient;
+    return diffuse + ambient;
 }
