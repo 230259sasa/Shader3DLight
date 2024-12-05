@@ -12,7 +12,7 @@ TestScene::TestScene(GameObject* parent)
 void TestScene::Initialize()
 {
 	hModel_[0] = Model::Load("Assets/pps.fbx");
-	hModel_[1] = Model::Load("Assets/ps.fbx");
+	hModel_[1] = Model::Load("Assets/froer2.fbx");
 	hModel_[2] = Model::Load("Assets/pp.fbx");
 }
 
@@ -55,17 +55,23 @@ void TestScene::Draw()
 {
 	Transform t;
 	t = transform_;
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 2; i++) {
 		t.position_.x += 2 * i;
-		if (i == 2) {
-			t.position_.x = Direct3D::GetGlobalLightVec().x;
-			t.position_.y = Direct3D::GetGlobalLightVec().y;
-			t.position_.z = Direct3D::GetGlobalLightVec().z;
+		if (i == 1) {
+			t.scale_ = { 5,2,5 };
+		}
+		else {
+			continue;
 		}
 		Model::SetTransform(hModel_[i], t);
 		Model::Draw(hModel_[i]);
 	}
-
+	t.position_.x = Direct3D::GetGlobalLightVec().x;
+	t.position_.y = Direct3D::GetGlobalLightVec().y;
+	t.position_.z = Direct3D::GetGlobalLightVec().z;
+	t.scale_ = { 0.5,0.5,0.5 };
+	Model::SetTransform(hModel_[2], t);
+	Model::Draw(hModel_[2]);
 	/*t.position_.x = 0;
 	t.position_.y = -1;
 	t.rotate_.y = 0;

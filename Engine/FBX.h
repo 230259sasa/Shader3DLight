@@ -23,11 +23,12 @@ class FBX
 	//コンスタントバッファー:　アプリ側から、シェーダーに毎フレーム渡したい情報
 	struct CONSTANT_BUFFER
 	{
-		XMMATRIX	matWVP;
-		XMMATRIX	matNormal;
-		XMFLOAT4	diffuseColor;
-		XMFLOAT4	globalLightVec;
-		XMFLOAT2	diffuseFactor;
+		XMMATRIX	matWVP;			//スクリーン変換マトリクス
+		XMMATRIX	matW;			//ワールド変換
+		XMMATRIX	matNormal;		//法線ワールド変換用
+		XMFLOAT4	diffuseColor;	//色(RGBの拡散反射係数)
+		XMFLOAT4	globalLightVec;	//光源位置
+		XMFLOAT2	diffuseFactor;	//拡散光の反射係数
 		int isTextured;
 	};
 

@@ -245,11 +245,12 @@ void FBX::Draw(Transform& transform)
 	for (int i = 0; i < materialCount_; i++) {
 		CONSTANT_BUFFER cb;
 		cb.matWVP = XMMatrixTranspose(transform.GetWorldMatrix() * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
+		cb.matW = XMMatrixTranspose(transform.GetWorldMatrix());
 		cb.matNormal = XMMatrixTranspose(transform.GetNormalMatrix());
 		cb.diffuseColor = pMaterialList_[i].diffuse;
+		cb.globalLightVec = Direct3D::GetGlobalLightVec();
 		cb.diffuseFactor = pMaterialList_[i].factor;
 		cb.isTextured = (pMaterialList_[i].pTexture != nullptr);
-		cb.globalLightVec = Direct3D::GetGlobalLightVec();
 		/*if (pMaterialList_[i].pTexture == nullptr) {
 			cb.isTextured = false;
 		}

@@ -12,7 +12,8 @@ cbuffer global
 {
     //変換行列、視点、光源
     float4x4 matWVP; // ワールド・ビュー・プロジェクションの合成行列
-    float4x4 matW; //法線をワールド座標に対応させる行列＝回転＊
+    float4x4 matW;
+    float4x4 matNormal; //法線をワールド座標に対応させる行列＝回転＊
     float4 diffuseColor; //拡散反射係数
     float4 lightVec; //平行光源のベクトル
     float2 factor; //diffuseFactor
@@ -24,9 +25,11 @@ cbuffer global
 //───────────────────────────────────────
 struct VS_OUT
 {
+    float4 wpos : POSITION;
     float4 pos : SV_POSITION; //位置
     float2 uv : TEXCOORD; //UV座標
-    float4 color : COLOR; //色（明るさ）
+    //float4 color : COLOR; //色（明るさ）
+    float4 wnormal : NORMAL;
 };
 
 //───────────────────────────────────────
@@ -39,18 +42,18 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
 
 	//ローカル座標に、ワールド・ビュー・プロジェクション行列をかけて
 	//スクリーン座標に変換し、ピクセルシェーダーへ
+    
     outData.pos = mul(pos, matWVP);
+    outData.wpos = mul(pos, matW);
+    outData.wnormal = mul(normal, matNormal);
     outData.uv = uv;
+    //outData.normal = wnormal;
     
     //float4 light = float4(1, 1, -1, 0); //光源ベクトルの逆ベクトル
-    normal = mul(normal, matW);
-    normal.w = 0;
-    normal = normalize(normal);
     
-    float4 light = lightVec - outData.pos;
-    light = normalize(light); //単位ベクトル化
+    //float4 light = normalize(lightVec - wos); //単位ベクトル化
     
-    outData.color = clamp(dot(normal, light), 0, 1);
+    //outData.color = clamp(dot(normalize(wnormal), -light), 0, 1);
     //outData.color = normal;
 	//まとめて出力
     return outData;
@@ -61,30 +64,54 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
 //───────────────────────────────────────
 float4 PS(VS_OUT inData) : SV_Target
 {
-    //float4 ambentSource = { 0.5, 0.5, 0.5, 1.0 }; //環境光の強さ
-    float4 diffuse;
-    float4 ambient;
-    float4 dir = lightVec - inData.pos;
-    float len = length(dir);
-    dir = normalize(dir);
-    float col = saturate(dot(normalize(inData.pos), dir))
-    * saturate(1.0f / (1.0f + 1.0f * len + 1.0f * len * len));
-    float4 ambentSource = { col, col, col, 1.0 }; //環境光の強さ
-    
-    //float4 light = lightVec - inData.pos;
-    //light = normalize(light); //単位ベクトル化
-    //ambentSource = clamp(dot(inData.color, light), 0, 1);
-    //ambentSource = inData.color;
-    
-    if (isTextured == false)
+    float3 diffuse = {0, 0, 0};
+    float3 ambient = { 0, 0, 0 };
+    float4 light[3] = { lightVec, float4(-2, 2, 0, 1.0f), float4(4, 2, 0, 1.0f) };
+    for (int i = 0; i < 3; i++)
     {
-        diffuse = diffuseColor * inData.color * factor.x;
-        ambient = diffuseColor * ambentSource * factor.x;
+        float3 ambentSource = { 0.1, 0.1, 0.1 }; //環境光の強さ
+        float3 dir = normalize(light[i].xyz - inData.wpos.xyz); //ピクセル位置のポリゴンの3次元座標 wpos
+        inData.wnormal.z = 0;
+        float3 color = saturate(dot(normalize(inData.wnormal.xyz), dir));
+        float len = length(light[i].xyz - inData.wpos.xyz);
+        float3 k = { 0.3f, 0.3f, 0.3f };
+        float colA = 1.0 / (k.x + k.y * len + k.z * len * len);
+
+    
+        if (isTextured == false)
+        {
+            diffuse += diffuseColor.xyz * color * factor.x;
+            ambient += diffuseColor.xyz * ambentSource * factor.x;
+        }
+        else
+        {
+            diffuse += g_texture.Sample(g_sampler, inData.uv).xyz * color * colA;
+            ambient += g_texture.Sample(g_sampler, inData.uv).xyz * ambentSource * factor.x;
+        }
     }
-    else
-    {
-        diffuse = g_texture.Sample(g_sampler, inData.uv) * inData.color * factor.x;
-        ambient = g_texture.Sample(g_sampler, inData.uv) * ambentSource * factor.x;
-    }
-    return diffuse + ambient;
+        
+    //float4 light = lightVec * 1;
+    //float3 ambentSource = { 0.3, 0.3, 0.3}; //環境光の強さ
+    //float3 diffuse;
+    //float3 ambient;
+    //float3 dir = normalize(light.xyz - inData.wpos.xyz);//ピクセル位置のポリゴンの3次元座標 wpos
+    //inData.wnormal.z = 0;
+    //float3 color = saturate(dot(normalize(inData.wnormal.xyz), dir));
+    //float len = length(light.xyz - inData.wpos.xyz);
+    //float3 k = {0.2f, 0.2f, 0.2f };
+    //float colA = 1.0 / (k.x + k.y * len + k.z * len * len);
+
+    
+    //if (isTextured == false)
+    //{
+    //    diffuse = diffuseColor.xyz * color * factor.x;
+    //    ambient = diffuseColor.xyz * ambentSource * factor.x;
+    //}
+    //else
+    //{
+    //    diffuse = g_texture.Sample(g_sampler, inData.uv).xyz * color * colA;
+    //    ambient = g_texture.Sample(g_sampler, inData.uv).xyz * ambentSource * factor.x;
+    //}
+    
+    return float4(diffuse + ambient, 1.0f);
 }
