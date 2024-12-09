@@ -27,7 +27,7 @@ class FBX
 		XMMATRIX	matW;			//ワールド変換
 		XMMATRIX	matNormal;		//法線ワールド変換用
 		XMFLOAT4	diffuseColor;	//色(RGBの拡散反射係数)
-		XMFLOAT4	globalLightVec;	//光源位置
+		//XMFLOAT4	globalLightVec;	//光源位置
 		XMFLOAT2	diffuseFactor;	//拡散光の反射係数
 		int isTextured;
 	};

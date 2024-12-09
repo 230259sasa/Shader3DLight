@@ -4,16 +4,38 @@
 #include"Engine\Model.h"
 #include"Engine\Direct3D.h"
 
+
+void TestScene::InitConstantBuffer()
+{
+	D3D11_BUFFER_DESC cb;
+	cb.ByteWidth = sizeof(CONSTBUFFER_STAGE);
+	cb.Usage = D3D11_USAGE_DYNAMIC;
+	cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cb.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cb.MiscFlags = 0;
+	cb.StructureByteStride = 0;
+
+	// コンスタントバッファの作成
+	HRESULT hr;
+	hr = Direct3D::pDevice->CreateBuffer(&cb, nullptr, &pConstantBuffer_);
+	if (FAILED(hr))
+	{
+		MessageBox(NULL, L"コンスタントバッファの作成に失敗しました", L"エラー", MB_OK);
+	}
+}
+
 TestScene::TestScene(GameObject* parent)
-	:GameObject(parent,"TestScene")
+	:GameObject(parent,"TestScene"),pConstantBuffer_(nullptr)
 {
 }
 
 void TestScene::Initialize()
 {
-	hModel_[0] = Model::Load("Assets/pps.fbx");
+	hModel_[0] = Model::Load("Assets/phon.fbx");
 	hModel_[1] = Model::Load("Assets/froer2.fbx");
 	hModel_[2] = Model::Load("Assets/pp.fbx");
+
+	InitConstantBuffer();
 }
 
 void TestScene::Update()
@@ -57,12 +79,6 @@ void TestScene::Draw()
 	t = transform_;
 	for (int i = 0; i < 2; i++) {
 		t.position_.x += 2 * i;
-		if (i == 1) {
-			t.scale_ = { 5,2,5 };
-		}
-		else {
-			continue;
-		}
 		Model::SetTransform(hModel_[i], t);
 		Model::Draw(hModel_[i]);
 	}

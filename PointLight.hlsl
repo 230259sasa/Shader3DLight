@@ -64,54 +64,54 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
 //───────────────────────────────────────
 float4 PS(VS_OUT inData) : SV_Target
 {
-    float3 diffuse = {0, 0, 0};
-    float3 ambient = { 0, 0, 0 };
-    float4 light[3] = { lightVec, float4(-2, 3.5f, 0, 1.0f), float4(4, 1, 0, 1.0f) };
-    float3 k[3] = { { 0.3f, 0.3f, 0.3f }, { 0.07f, 0.07f, 0.07f }, { 0.2f, 0.2f, 0.2f } };
-    for (int i = 0; i < 3; i++)
-    {
-        float3 ambentSource = { 0.01, 0.01, 0.01 }; //環境光の強さ
-        float3 dir = normalize(light[i].xyz - inData.wpos.xyz); //ピクセル位置のポリゴンの3次元座標 wpos
-        inData.wnormal.z = 0;
-        float3 color = saturate(dot(normalize(inData.wnormal.xyz), dir));
-        float len = length(light[i].xyz - inData.wpos.xyz);
-        float colA = 1.0 / (k[i].x + k[i].y * len + k[i].z * len * len);
+    //float3 diffuse = {0, 0, 0};
+    //float3 ambient = { 0, 0, 0 };
+    //float4 light[3] = { lightVec, float4(-2, 3.5f, 0, 1.0f), float4(4, 1, 0, 1.0f) };
+    //float3 k[3] = { { 0.3f, 0.3f, 0.3f }, { 0.07f, 0.07f, 0.07f }, { 0.2f, 0.2f, 0.2f } };
+    //for (int i = 0; i < 3; i++)
+    //{
+    //    float3 ambentSource = { 0.01, 0.01, 0.01 }; //環境光の強さ
+    //    float3 dir = normalize(light[i].xyz - inData.wpos.xyz); //ピクセル位置のポリゴンの3次元座標 wpos
+    //    inData.wnormal.z = 0;
+    //    float3 color = saturate(dot(normalize(inData.wnormal.xyz), dir));
+    //    float len = length(light[i].xyz - inData.wpos.xyz);
+    //    float colA = 1.0 / (k[i].x + k[i].y * len + k[i].z * len * len);
 
     
-        if (isTextured == false)
-        {
-            diffuse += diffuseColor.xyz * color * factor.x;
-            ambient += diffuseColor.xyz * ambentSource * factor.x;
-        }
-        else
-        {
-            diffuse += g_texture.Sample(g_sampler, inData.uv).xyz * color * colA;
-            ambient += g_texture.Sample(g_sampler, inData.uv).xyz * ambentSource * factor.x;
-        }
-    }
+    //    if (isTextured == false)
+    //    {
+    //        diffuse += diffuseColor.xyz * color * factor.x;
+    //        ambient += diffuseColor.xyz * ambentSource * factor.x;
+    //    }
+    //    else
+    //    {
+    //        diffuse += g_texture.Sample(g_sampler, inData.uv).xyz * color * colA;
+    //        ambient += g_texture.Sample(g_sampler, inData.uv).xyz * ambentSource * factor.x;
+    //    }
+    //}
         
-    //float4 light = lightVec * 1;
-    //float3 ambentSource = { 0.3, 0.3, 0.3}; //環境光の強さ
-    //float3 diffuse;
-    //float3 ambient;
-    //float3 dir = normalize(light.xyz - inData.wpos.xyz);//ピクセル位置のポリゴンの3次元座標 wpos
-    //inData.wnormal.z = 0;
-    //float3 color = saturate(dot(normalize(inData.wnormal.xyz), dir));
-    //float len = length(light.xyz - inData.wpos.xyz);
-    //float3 k = {0.2f, 0.2f, 0.2f };
-    //float colA = 1.0 / (k.x + k.y * len + k.z * len * len);
+    float4 light = lightVec * 1;
+    float3 ambentSource = { 0.3, 0.3, 0.3 }; //環境光の強さ
+    float3 diffuse;
+    float3 ambient;
+    float3 dir = normalize(light.xyz - inData.wpos.xyz); //ピクセル位置のポリゴンの3次元座標 wpos
+    inData.wnormal.z = 0;
+    float3 color = saturate(dot(normalize(inData.wnormal.xyz), dir));
+    float len = length(light.xyz - inData.wpos.xyz);
+    float3 k = { 0.1f, 0.1f, 0.1f };
+    float colA = 1.0 / (k.x + k.y * len + k.z * len * len);
 
     
-    //if (isTextured == false)
-    //{
-    //    diffuse = diffuseColor.xyz * color * factor.x;
-    //    ambient = diffuseColor.xyz * ambentSource * factor.x;
-    //}
-    //else
-    //{
-    //    diffuse = g_texture.Sample(g_sampler, inData.uv).xyz * color * colA;
-    //    ambient = g_texture.Sample(g_sampler, inData.uv).xyz * ambentSource * factor.x;
-    //}
+    if (isTextured == false)
+    {
+        diffuse = diffuseColor.xyz * color * factor.x;
+        ambient = diffuseColor.xyz * ambentSource * factor.x;
+    }
+    else
+    {
+        diffuse = g_texture.Sample(g_sampler, inData.uv).xyz * color * colA;
+        ambient = g_texture.Sample(g_sampler, inData.uv).xyz * ambentSource * factor.x;
+    }
     
     return float4(diffuse + ambient, 1.0f);
 }

@@ -221,12 +221,8 @@ void FBX::InitMaterial(fbxsdk::FbxNode* pNode)
 			pMaterialList_[i].diffuse = XMFLOAT4((float)diffuse[0], (float)diffuse[1], (float)diffuse[2],
 				1.0f);
 		}
-
-
 	}
 }
-
-
 
 void FBX::Draw(Transform& transform)
 {
@@ -248,7 +244,7 @@ void FBX::Draw(Transform& transform)
 		cb.matW = XMMatrixTranspose(transform.GetWorldMatrix());
 		cb.matNormal = XMMatrixTranspose(transform.GetNormalMatrix());
 		cb.diffuseColor = pMaterialList_[i].diffuse;
-		cb.globalLightVec = Direct3D::GetGlobalLightVec();
+		//cb.globalLightVec = Direct3D::GetGlobalLightVec();
 		cb.diffuseFactor = pMaterialList_[i].factor;
 		cb.isTextured = (pMaterialList_[i].pTexture != nullptr);
 		/*if (pMaterialList_[i].pTexture == nullptr) {
