@@ -17,8 +17,11 @@ class FBX
 	struct MATERIAL
 	{
 		Texture* pTexture;
-		XMFLOAT4 diffuse;
-		XMFLOAT2 factor;
+		XMFLOAT4 diffuse; 
+		XMFLOAT4 specular; //鏡面反射係数
+		XMFLOAT4 shininess;//鏡面反射のパラメータ
+		XMFLOAT4 ambient; //環境光の反射係数（色？
+		XMFLOAT2 factor; //スカラ
 	};
 	//コンスタントバッファー:　アプリ側から、シェーダーに毎フレーム渡したい情報
 	struct CONSTANT_BUFFER

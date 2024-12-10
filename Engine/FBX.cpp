@@ -206,20 +206,40 @@ void FBX::InitMaterial(fbxsdk::FbxNode* pNode)
 			{
 				//Error must be handled here
 			}
-			FbxSurfaceLambert* pMaterial = (FbxSurfaceLambert*)pNode->GetMaterial(i);
+
+			FbxSurfacePhong* pMaterial = (FbxSurfacePhong*)pNode->GetMaterial(i);
 			FbxDouble diffuse = pMaterial->DiffuseFactor;
 			pMaterialList_[i].factor = XMFLOAT2((float)diffuse, (float)diffuse);
+			FbxDouble3 ambient = pMaterial->Ambient;
+			pMaterialList_[i].ambient = { ambient[0],ambient[1],ambient[2],1.0f };
 
+			if (pMaterial->GetClassId().Is(FbxSurfacePhong::ClassId)) {
+				FbxDouble3 specular = pMaterial->Specular;
+				FbxDouble shininess = pMaterial->Shininess;
+			}
+			pMaterialList_[i].specular = { 0,0,0,0 };
+			pMaterialList_[i].shininess = { 0,0,0,0 };
 		}
 		//テクスチャ無し
 		else
 		{
 			//this part are witten after
 			pMaterialList_[i].pTexture = nullptr;
-			FbxSurfaceLambert* pMaterial = (FbxSurfaceLambert*)pNode->GetMaterial(i);
+			FbxSurfacePhong* pMaterial = (FbxSurfacePhong*)pNode->GetMaterial(i);
 			FbxDouble3 diffuse = pMaterial->Diffuse;
 			pMaterialList_[i].diffuse = XMFLOAT4((float)diffuse[0], (float)diffuse[1], (float)diffuse[2],
 				1.0f);
+			FbxDouble factor = pMaterial->DiffuseFactor;
+			pMaterialList_[i].factor = XMFLOAT2((float)factor, (float)factor);
+			FbxDouble3 ambient = pMaterial->Ambient;
+			pMaterialList_[i].ambient = { ambient[0],ambient[1],ambient[2],1.0f };
+
+			if (pMaterial->GetClassId().Is(FbxSurfacePhong::ClassId)) {
+				FbxDouble3 specular = pMaterial->Specular;
+				FbxDouble shininess = pMaterial->Shininess;
+			}
+			pMaterialList_[i].specular = { 0,0,0,0 };
+			pMaterialList_[i].shininess = { 0,0,0,0 };
 		}
 	}
 }
