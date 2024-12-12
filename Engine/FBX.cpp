@@ -211,14 +211,16 @@ void FBX::InitMaterial(fbxsdk::FbxNode* pNode)
 			FbxDouble diffuse = pMaterial->DiffuseFactor;
 			pMaterialList_[i].factor = XMFLOAT2((float)diffuse, (float)diffuse);
 			FbxDouble3 ambient = pMaterial->Ambient;
-			pMaterialList_[i].ambient = { ambient[0],ambient[1],ambient[2],1.0f };
+			pMaterialList_[i].ambient = { (float)ambient[0],(float)ambient[1],(float)ambient[2],1.0f };
 
+			pMaterialList_[i].specular = { 0,0,0,0 };
+			pMaterialList_[i].shininess = { 0,0,0,0 };
 			if (pMaterial->GetClassId().Is(FbxSurfacePhong::ClassId)) {
 				FbxDouble3 specular = pMaterial->Specular;
 				FbxDouble shininess = pMaterial->Shininess;
+				pMaterialList_[i].specular = { (float)specular[0],(float)specular[1],(float)specular[2],1.0f };
+				pMaterialList_[i].shininess = { (float)shininess,(float)shininess ,(float)shininess,1.0f };
 			}
-			pMaterialList_[i].specular = { 0,0,0,0 };
-			pMaterialList_[i].shininess = { 0,0,0,0 };
 		}
 		//テクスチャ無し
 		else
@@ -232,14 +234,16 @@ void FBX::InitMaterial(fbxsdk::FbxNode* pNode)
 			FbxDouble factor = pMaterial->DiffuseFactor;
 			pMaterialList_[i].factor = XMFLOAT2((float)factor, (float)factor);
 			FbxDouble3 ambient = pMaterial->Ambient;
-			pMaterialList_[i].ambient = { ambient[0],ambient[1],ambient[2],1.0f };
+			pMaterialList_[i].ambient = { (float)ambient[0],(float)ambient[1],(float)ambient[2],1.0f };
 
+			pMaterialList_[i].specular = { 0,0,0,0 };
+			pMaterialList_[i].shininess = { 0,0,0,0 };
 			if (pMaterial->GetClassId().Is(FbxSurfacePhong::ClassId)) {
 				FbxDouble3 specular = pMaterial->Specular;
 				FbxDouble shininess = pMaterial->Shininess;
+				pMaterialList_[i].specular = { (float)specular[0],(float)specular[1],(float)specular[2],1.0f };
+				pMaterialList_[i].shininess = { (float)shininess,(float)shininess ,(float)shininess,1.0f };
 			}
-			pMaterialList_[i].specular = { 0,0,0,0 };
-			pMaterialList_[i].shininess = { 0,0,0,0 };
 		}
 	}
 }
@@ -266,6 +270,9 @@ void FBX::Draw(Transform& transform)
 		cb.diffuseColor = pMaterialList_[i].diffuse;
 		//cb.globalLightVec = Direct3D::GetGlobalLightVec();
 		cb.diffuseFactor = pMaterialList_[i].factor;
+		cb.ambientColor = pMaterialList_[i].ambient;
+		cb.specularColor = pMaterialList_[i].specular;
+		cb.shininess = pMaterialList_[i].shininess;
 		cb.isTextured = (pMaterialList_[i].pTexture != nullptr);
 		/*if (pMaterialList_[i].pTexture == nullptr) {
 			cb.isTextured = false;

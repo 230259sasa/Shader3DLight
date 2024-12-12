@@ -32,6 +32,9 @@ class FBX
 		XMFLOAT4	diffuseColor;	//F(RGB‚ÌŠgU”½ËŒW”)
 		//XMFLOAT4	globalLightVec;	//ŒõŒ¹ˆÊ’u
 		XMFLOAT2	diffuseFactor;	//ŠgUŒõ‚Ì”½ËŒW”
+		XMFLOAT4	ambientColor;
+		XMFLOAT4	specularColor;
+		XMFLOAT4	shininess;
 		int isTextured;
 	};
 
