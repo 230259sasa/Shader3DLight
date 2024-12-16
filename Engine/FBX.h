@@ -13,6 +13,10 @@
 
 class FBX
 {
+	enum RENDER_STATE {
+		RENDER_3D,
+		RENDER_POINT
+	};
 	//マテリアル
 	struct MATERIAL
 	{
@@ -21,7 +25,7 @@ class FBX
 		XMFLOAT4 specular; //鏡面反射係数
 		XMFLOAT4 shininess;//鏡面反射のパラメータ
 		XMFLOAT4 ambient; //環境光の反射係数（色？
-		XMFLOAT2 factor; //スカラ
+		XMFLOAT4 factor; //スカラ
 	};
 	//コンスタントバッファー:　アプリ側から、シェーダーに毎フレーム渡したい情報
 	struct CONSTANT_BUFFER
@@ -31,7 +35,7 @@ class FBX
 		XMMATRIX	matNormal;		//法線ワールド変換用
 		XMFLOAT4	diffuseColor;	//色(RGBの拡散反射係数)
 		//XMFLOAT4	globalLightVec;	//光源位置
-		XMFLOAT2	diffuseFactor;	//拡散光の反射係数
+		XMFLOAT4	diffuseFactor;	//拡散光の反射係数
 		XMFLOAT4	ambientColor;
 		XMFLOAT4	specularColor;
 		XMFLOAT4	shininess;
@@ -45,6 +49,8 @@ class FBX
 		XMVECTOR uv;
 		XMVECTOR normal; //ノーマル追加（法線ベクトル）
 	};
+
+	RENDER_STATE state_;
 
 	ID3D11Buffer* pVertexBuffer_;//頂点バッファ用メモリ
 	ID3D11Buffer** pIndexBuffer_;//インデックスバッファ用メモリ

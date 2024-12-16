@@ -1,12 +1,13 @@
 #include "FBX.h"
 #include"Camera.h"
 #include<filesystem>
+#include"Input.h"
 
 namespace fs = std::filesystem;
 
 FBX::FBX()
 	:pVertexBuffer_(nullptr), pIndexBuffer_(nullptr), pConstantBuffer_(nullptr),
-	vertexCount_(-1), polygonCount_(-1)
+	vertexCount_(-1), polygonCount_(-1),state_(RENDER_3D)
 {
 }
 
@@ -209,7 +210,7 @@ void FBX::InitMaterial(fbxsdk::FbxNode* pNode)
 
 			FbxSurfacePhong* pMaterial = (FbxSurfacePhong*)pNode->GetMaterial(i);
 			FbxDouble diffuse = pMaterial->DiffuseFactor;
-			pMaterialList_[i].factor = XMFLOAT2((float)diffuse, (float)diffuse);
+			pMaterialList_[i].factor = XMFLOAT4((float)diffuse, (float)diffuse, (float)diffuse, (float)diffuse);
 			FbxDouble3 ambient = pMaterial->Ambient;
 			pMaterialList_[i].ambient = { (float)ambient[0],(float)ambient[1],(float)ambient[2],1.0f };
 
@@ -232,7 +233,7 @@ void FBX::InitMaterial(fbxsdk::FbxNode* pNode)
 			pMaterialList_[i].diffuse = XMFLOAT4((float)diffuse[0], (float)diffuse[1], (float)diffuse[2],
 				1.0f);
 			FbxDouble factor = pMaterial->DiffuseFactor;
-			pMaterialList_[i].factor = XMFLOAT2((float)factor, (float)factor);
+			pMaterialList_[i].factor = XMFLOAT4((float)factor, (float)factor, (float)factor, (float)factor);
 			FbxDouble3 ambient = pMaterial->Ambient;
 			pMaterialList_[i].ambient = { (float)ambient[0],(float)ambient[1],(float)ambient[2],1.0f };
 
@@ -250,8 +251,17 @@ void FBX::InitMaterial(fbxsdk::FbxNode* pNode)
 
 void FBX::Draw(Transform& transform)
 {
+	if (Input::IsKeyDown(DIK_P)) {
+		if (state_ == RENDER_POINT)
+			state_ = RENDER_3D;
+		else
+			state_ = RENDER_POINT;
+	}
 	//Quadをアレンジ
-	Direct3D::SetShader(SHADER_POINT);
+	if(state_ == RENDER_POINT)
+		Direct3D::SetShader(SHADER_POINT);
+	else
+		Direct3D::SetShader(SHADER_3D);
 	transform.Calculation();
 
 	//頂点バッファ、インデックスバッファ、コンスタントバッファをパイプラインにセット

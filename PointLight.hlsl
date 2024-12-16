@@ -16,7 +16,7 @@ cbuffer global : register(b0)
     float4x4 matNormal; //法線をワールド座標に対応させる行列＝回転＊
     float4 diffuseColor; //拡散反射係数
     //float4 lightVec; //平行光源のベクトル
-    float2 factor; //diffuseFactor
+    float4 factor; //diffuseFactor
     float4 ambientColor;
     float4 specularColor;
     float4 shininess;
@@ -76,31 +76,31 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
 float4 PS(VS_OUT inData) : SV_Target
 {
     float4 light = lightVec * 1;
-    float3 ambentSource = { 0.3, 0.3, 0.3 }; //環境光の強さ
-    float3 diffuse;
-    float3 ambient;
+    float4 ambentSource = { 0.3, 0.3, 0.3 ,1.0}; //環境光の強さ
+    float4 diffuse;
+    float4 ambient;
     float3 dir = normalize(light.xyz - inData.wpos.xyz); //ピクセル位置のポリゴンの3次元座標 wpos
-    inData.normal.z = 0;
-    float3 color = saturate(dot(normalize(inData.normal.xyz), dir));
+    //inData.normal.z = 0;
+    float color = saturate(dot(normalize(inData.normal.xyz), dir));
     float len = length(light.xyz - inData.wpos.xyz);
     float3 k = { 0.1f, 0.1f, 0.1f };
     float colA = 1.0 / (k.x + k.y * len + k.z * len * len);
     
     
-    float3 r = reflect(normalize(inData.normal), normalize(float4((float2)-dir,0, 0)));
-    float specular = pow(saturate(dot(r, normalize((float3)inData.eyev))),shininess) * specularColor;
+    float4 r = reflect(normalize(inData.normal), normalize(float4(-dir, 1)));
+    float4 specular = pow(saturate(dot(r, normalize(inData.eyev))),shininess) * specularColor;
 
     
     if (isTextured == false)
     {
-        diffuse = diffuseColor.xyz * color * factor.x;
-        ambient = diffuseColor.xyz * ambentSource * factor.x;
+        diffuse = diffuseColor * color * colA * factor.x;
+        ambient = diffuseColor * ambentSource;
     }
     else
     {
-        diffuse = g_texture.Sample(g_sampler, inData.uv).xyz * color * colA * factor.x;
-        ambient = g_texture.Sample(g_sampler, inData.uv).xyz * ambentSource * factor.x;
+        diffuse = g_texture.Sample(g_sampler, inData.uv) * color * colA * factor.x;
+        ambient = g_texture.Sample(g_sampler, inData.uv) * ambentSource;
     }
     
-    return float4(diffuse + ambient + specular, 1.0f);
+    return diffuse + ambient + specular;
 }
