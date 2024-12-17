@@ -75,7 +75,7 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
 //„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ
 float4 PS(VS_OUT inData) : SV_Target
 {
-    float4 light = lightVec * 1;
+    float4 light = lightVec;
     float4 ambentSource = { 0.3, 0.3, 0.3 ,1.0}; //ŠÂ‹«Œõ‚Ì‹­‚³
     float4 diffuse;
     float4 ambient;
@@ -94,12 +94,12 @@ float4 PS(VS_OUT inData) : SV_Target
     if (isTextured == false)
     {
         diffuse = diffuseColor * color * colA * factor.x;
-        ambient = diffuseColor * ambentSource;
+        ambient = diffuseColor * ambentSource * factor.x;;
     }
     else
     {
         diffuse = g_texture.Sample(g_sampler, inData.uv) * color * colA * factor.x;
-        ambient = g_texture.Sample(g_sampler, inData.uv) * ambentSource;
+        ambient = g_texture.Sample(g_sampler, inData.uv) * ambentSource * factor.x;;
     }
     
     return diffuse + ambient + specular;

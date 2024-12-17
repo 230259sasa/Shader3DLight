@@ -16,4 +16,5 @@ namespace Model
 	void SetTransform(int hModel, Transform transform);
 	void Draw(int hModel);
 	void Release();
+	void ChangeShader();//kese
 }

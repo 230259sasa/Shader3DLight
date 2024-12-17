@@ -16,9 +16,13 @@ int Model::Load(std::string filename)
 
 	for (auto& e : modelList)
 	{
+		int count = 0;
 		//“Ç‚Ýž‚ÝÏ‚Ý‚È‚ç
 		if (e->filename_ == filename) {
+			int n = count;
+			count++;
 			pData->pFbx_ = e->pFbx_;
+			return n;
 			break;
 		}
 	}
@@ -59,4 +63,11 @@ void Model::Release()
 		SAFE_DELETE(modelList[j]);
 	}
 	modelList.clear();
+}
+
+void Model::ChangeShader()
+{
+	for (auto itr : modelList) {
+		itr->pFbx_->Update();
+	}
 }

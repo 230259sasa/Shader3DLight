@@ -34,9 +34,12 @@ cbuffer gStage : register(b1)
 //───────────────────────────────────────
 struct VS_OUT
 {
+    float4 wpos : POSITION0;
     float4 pos : SV_POSITION; //位置
     float2 uv : TEXCOORD; //UV座標
     float4 cos_alpha : COLOR; //色（明るさ）
+    float4 normal : NORMAL;
+    float4 eyev : POSITION1;
 };
 
 //───────────────────────────────────────
@@ -50,18 +53,23 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal: NORMAL)
 	//ローカル座標に、ワールド・ビュー・プロジェクション行列をかけて
 	//スクリーン座標に変換し、ピクセルシェーダーへ
     outData.pos = mul(pos, matWVP);
+    outData.wpos = mul(pos, matW);
     outData.uv = uv;
     
     //float4 light = float4(1, 1, -1, 0); //光源ベクトルの逆ベクトル
     float4 light = lightVec;
     light = normalize(light);//単位ベクトル化
 
-    normal = mul(normal, matW);
-    normal = normalize(normal);
-    normal.w = 0;
-    light.w = 0;
+    normal = mul(normal, matNormal);
+    outData.normal = normal;
+   // normal = normalize(normal);
+   // normal.w = 0;
+   //light.w = 0;
     
     outData.cos_alpha = clamp(dot(normal, light), 0, 1);
+    //outData.cos_alpha = saturate(dot(normalize(normal), 0));
+    outData.eyev = eyePosition - mul(pos, matW);
+    
 	//まとめて出力
     return outData;
 }
@@ -76,9 +84,13 @@ float4 PS(VS_OUT inData) : SV_Target
     //float4 Id = { 1.0, 1.0, 1.0, 0.0 };
     //float4 Kd = g_texture.Sample(g_sampler, inData.uv);
     //float cos_alpha = inData.cos_alpha;
-    float4 ambentSource = { 0.5, 0.5, 0.5, 1.0 };//環境光の強さ
+    float4 ambentSource = { 0.7, 0.7, 0.7, 1.0 };//環境光の強さ
     float4 diffuse;
     float4 ambient;
+    
+    float3 dir = normalize(lightVec.xyz - inData.wpos.xyz);
+    float4 r = reflect(normalize(inData.normal), normalize(float4(-dir, 1)));
+    float4 specular = pow(saturate(dot(r, normalize(inData.eyev))), shininess) * specularColor;
     
     if (isTextured == false)
     {
@@ -90,8 +102,8 @@ float4 PS(VS_OUT inData) : SV_Target
     {
         //return Id * Kd * cos_alpha + Id * Kd * ambentSource;
         diffuse = g_texture.Sample(g_sampler, inData.uv) * inData.cos_alpha * factor.x;
-        ambient = g_texture.Sample(g_sampler, inData.uv) * ambentSource * factor.x;
+        ambient = g_texture.Sample(g_sampler, inData.uv) * ambentSource * factor.x;;
     }
     //return g_texture.Sample(g_sampler, myUv);
-    return diffuseColor + ambient;
+    return diffuse + ambient + specular;
 }

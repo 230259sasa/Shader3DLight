@@ -5,7 +5,6 @@
 #include"Engine\Direct3D.h"
 #include"Engine\Camera.h"
 
-
 void TestScene::InitConstantBuffer()
 {
 	D3D11_BUFFER_DESC cb;
@@ -33,8 +32,10 @@ TestScene::TestScene(GameObject* parent)
 void TestScene::Initialize()
 {
 	hModel_[0] = Model::Load("Assets/phon.fbx");
-	hModel_[1] = Model::Load("Assets/froer2.fbx");
-	hModel_[2] = Model::Load("Assets/pp.fbx");
+	hModel_[1] = Model::Load("Assets/notphon.fbx");
+	hModel_[2] = Model::Load("Assets/nottexphon.fbx");
+	hModel_[3] = Model::Load("Assets/nottexnotphon.fbx");
+	hModel_[4] = Model::Load("Assets/pp.fbx");
 
 	InitConstantBuffer();
 }
@@ -86,14 +87,19 @@ void TestScene::Update()
 	//コンスタントバッファ
 	Direct3D::pContext->VSSetConstantBuffers(1, 1, &pConstantBuffer_);	//頂点シェーダー用	
 	Direct3D::pContext->PSSetConstantBuffers(1, 1, &pConstantBuffer_);	//ピクセルシェーダー
+
+	if (Input::IsKeyDown(DIK_P)) {
+		Model::ChangeShader();
+	}
 }
 
 void TestScene::Draw()
 {
 	Transform t;
 	t = transform_;
-	for (int i = 0; i < 2; i++) {
-		t.position_.x += 2 * i;
+	float xpos = t.position_.x - 4;
+	for (int i = 0; i < MAX_MODEL-1; i++) {
+		t.position_.x = 2.5 * i + xpos;
 		Model::SetTransform(hModel_[i], t);
 		Model::Draw(hModel_[i]);
 	}
@@ -101,8 +107,8 @@ void TestScene::Draw()
 	t.position_.y = Direct3D::GetGlobalLightVec().y;
 	t.position_.z = Direct3D::GetGlobalLightVec().z;
 	t.scale_ = { 0.5,0.5,0.5 };
-	Model::SetTransform(hModel_[2], t);
-	Model::Draw(hModel_[2]);
+	Model::SetTransform(hModel_[MAX_MODEL-1], t);
+	Model::Draw(hModel_[MAX_MODEL-1]);
 	/*t.position_.x = 0;
 	t.position_.y = -1;
 	t.rotate_.y = 0;

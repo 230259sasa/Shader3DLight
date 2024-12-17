@@ -222,6 +222,11 @@ void FBX::InitMaterial(fbxsdk::FbxNode* pNode)
 				pMaterialList_[i].specular = { (float)specular[0],(float)specular[1],(float)specular[2],1.0f };
 				pMaterialList_[i].shininess = { (float)shininess,(float)shininess ,(float)shininess,1.0f };
 			}
+			else
+			{
+				pMaterialList_[i].specular = { 0.0f,0.0f,0.0f,1.0f };
+				pMaterialList_[i].shininess = { 10.0f,10.0f,10.0f, 1.0 };
+			}
 		}
 		//テクスチャ無し
 		else
@@ -230,8 +235,7 @@ void FBX::InitMaterial(fbxsdk::FbxNode* pNode)
 			pMaterialList_[i].pTexture = nullptr;
 			FbxSurfacePhong* pMaterial = (FbxSurfacePhong*)pNode->GetMaterial(i);
 			FbxDouble3 diffuse = pMaterial->Diffuse;
-			pMaterialList_[i].diffuse = XMFLOAT4((float)diffuse[0], (float)diffuse[1], (float)diffuse[2],
-				1.0f);
+			pMaterialList_[i].diffuse = XMFLOAT4((float)diffuse[0], (float)diffuse[1], (float)diffuse[2],1.0f);
 			FbxDouble factor = pMaterial->DiffuseFactor;
 			pMaterialList_[i].factor = XMFLOAT4((float)factor, (float)factor, (float)factor, (float)factor);
 			FbxDouble3 ambient = pMaterial->Ambient;
@@ -245,18 +249,17 @@ void FBX::InitMaterial(fbxsdk::FbxNode* pNode)
 				pMaterialList_[i].specular = { (float)specular[0],(float)specular[1],(float)specular[2],1.0f };
 				pMaterialList_[i].shininess = { (float)shininess,(float)shininess ,(float)shininess,1.0f };
 			}
+			else
+			{
+				pMaterialList_[i].specular = { 0.0f,0.0f,0.0f,1.0f };
+				pMaterialList_[i].shininess = { 10.0f,10.0f,10.0f, 1.0 };
+			}
 		}
 	}
 }
 
 void FBX::Draw(Transform& transform)
 {
-	if (Input::IsKeyDown(DIK_P)) {
-		if (state_ == RENDER_POINT)
-			state_ = RENDER_3D;
-		else
-			state_ = RENDER_POINT;
-	}
 	//Quadをアレンジ
 	if(state_ == RENDER_POINT)
 		Direct3D::SetShader(SHADER_POINT);
@@ -322,4 +325,12 @@ void FBX::Draw(Transform& transform)
 
 void FBX::Release()
 {
+}
+
+void FBX::Update()
+{
+	if (state_ == RENDER_POINT)
+		state_ = RENDER_3D;
+	else
+		state_ = RENDER_POINT;
 }
