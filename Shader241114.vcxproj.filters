@@ -121,6 +121,9 @@
     <FxCompile Include="PointLight.hlsl">
       <Filter>ソース ファイル\Engine</Filter>
     </FxCompile>
+    <FxCompile Include="ToonShader.hlsl">
+      <Filter>ソース ファイル\Engine</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

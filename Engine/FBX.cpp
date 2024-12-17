@@ -261,10 +261,7 @@ void FBX::InitMaterial(fbxsdk::FbxNode* pNode)
 void FBX::Draw(Transform& transform)
 {
 	//Quadをアレンジ
-	if(state_ == RENDER_POINT)
-		Direct3D::SetShader(SHADER_POINT);
-	else
-		Direct3D::SetShader(SHADER_3D);
+	Direct3D::SetShader(SHADER_POINT);
 	transform.Calculation();
 
 	//頂点バッファ、インデックスバッファ、コンスタントバッファをパイプラインにセット

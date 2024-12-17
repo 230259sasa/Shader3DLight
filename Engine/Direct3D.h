@@ -5,7 +5,8 @@
 
 enum SHADER_TYPE {
 	SHADER_2D,SHADER_3D,
-	SHADER_POINT,SHADER_MAX
+	SHADER_POINT,SHADER_TOON,
+	SHADER_MAX
 };
 //ƒŠƒ“ƒJ
 #pragma comment(lib, "d3d11.lib")
@@ -26,6 +27,7 @@ namespace Direct3D
 	HRESULT InitShader3D();
 	HRESULT InitShader2D();
 	HRESULT InitPointLightShader();
+	HRESULT InitShaderToon();
 	void SetShader(SHADER_TYPE type);
 	//•`‰æŠJŽn
 	void BeginDraw();
