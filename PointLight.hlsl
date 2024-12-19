@@ -84,7 +84,7 @@ float4 PS(VS_OUT inData) : SV_Target
     float color = saturate(dot(normalize(inData.normal.xyz), dir));
     float len = length(light.xyz - inData.wpos.xyz);
     float3 k = { 0.1f, 0.1f, 0.1f };
-    float colA = 1.0 / (k.x + k.y * len + k.z * len * len);
+    float colA = 1.0 / (k.x + k.y * len + k.z * len * len);// ãóó£å∏êä
     
     
     float4 r = reflect(normalize(inData.normal), normalize(float4(-dir, 1)));

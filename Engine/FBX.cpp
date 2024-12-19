@@ -56,6 +56,10 @@ HRESULT FBX::Load(std::string fileName)
 
 	//マネージャ解放
 	pFbxManager->Destroy();
+
+	pToonTex_ = new Texture;
+	pToonTex_->Load("Assets//toon.png");
+
 	return S_OK;
 }
 
@@ -261,7 +265,7 @@ void FBX::InitMaterial(fbxsdk::FbxNode* pNode)
 void FBX::Draw(Transform& transform)
 {
 	//Quadをアレンジ
-	Direct3D::SetShader(SHADER_POINT);
+	Direct3D::SetShader(SHADER_TOON);
 	transform.Calculation();
 
 	//頂点バッファ、インデックスバッファ、コンスタントバッファをパイプラインにセット
@@ -315,6 +319,10 @@ void FBX::Draw(Transform& transform)
 			Direct3D::pContext->PSSetShaderResources(0, 1, &pSRV);
 
 		}
+		ID3D11SamplerState* pSampler = pToonTex_->GetSampler();
+		Direct3D::pContext->PSSetSamplers(1, 1, &pSampler);
+		ID3D11ShaderResourceView* pSRV = pToonTex_->GetSRV();
+		Direct3D::pContext->PSSetShaderResources(1, 1, &pSRV);
 		//描画
 		Direct3D::pContext->DrawIndexed(polygonCount_ * 3, 0, 0);
 	}

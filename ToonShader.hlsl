@@ -4,6 +4,9 @@
 Texture2D g_texture : register(t0); //テクスチャー
 SamplerState g_sampler : register(s0); //サンプラー
 
+Texture2D g_toon_texture : register(t1); //テクスチャー
+SamplerState g_toon_sampler : register(s1); //サンプラー
+
 //───────────────────────────────────────
  // コンスタントバッファ
 // DirectX 側から送信されてくる、ポリゴン頂点以外の諸情報の定義
@@ -62,9 +65,9 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
 
     normal = mul(normal, matNormal);
     outData.normal = normal;
-   // normal = normalize(normal);
-   // normal.w = 0;
-   //light.w = 0;
+    //normal = normalize(normal);
+    //normal.w = 0;
+    //light.w = 0;
     
     outData.cos_alpha = clamp(dot(normal, light), 0, 1);
     //outData.cos_alpha = saturate(dot(normalize(normal), 0));
@@ -84,26 +87,39 @@ float4 PS(VS_OUT inData) : SV_Target
     //float4 Id = { 1.0, 1.0, 1.0, 0.0 };
     //float4 Kd = g_texture.Sample(g_sampler, inData.uv);
     //float cos_alpha = inData.cos_alpha;
-    float4 ambentSource = { 0.7, 0.7, 0.7, 1.0 }; //環境光の強さ
+    float4 ambentSource = { 0.5, 0.5, 0.5, 1.0 }; //環境光の強さ
     float4 diffuse;
     float4 ambient;
     
     float3 dir = normalize(lightVec.xyz - inData.wpos.xyz);
     float4 r = reflect(normalize(inData.normal), normalize(float4(-dir, 1)));
     float4 specular = pow(saturate(dot(r, normalize(inData.eyev))), shininess) * specularColor;
+    float color = saturate(dot(normalize(inData.normal.xyz), dir));
+    float len = length(lightVec.xyz - inData.wpos.xyz);
+    float3 k = { 0.1f, 0.1f, 0.1f };
+    float colA = 1.0 / (k.x + k.y * len + k.z * len * len); // 距離減衰
+    
+    float4 NL = saturate(dot(normalize(inData.normal.xyz), dir));
+    float4 n1 = float4(1.0f / 4.0f, 1.0f / 4.0f, 1.0f / 4.0f, 1);
+    float4 n2 = float4(2.0f / 4.0f, 2.0f / 4.0f, 2.0f / 4.0f, 1);
+    float4 n3 = float4(3.0f / 4.0f, 3.0f / 4.0f, 3.0f / 4.0f, 1);
+    float4 tI = 0.1f * step(n1, NL) + 0.3 * step(n2, NL) + 0.6 * step(n3, NL);
+    float2 uv = float2(tI.x, 0);
+    float4 tUv = g_toon_texture.Sample(g_sampler, uv);
+    
+    //color -= color % (1.0f / 3.0f); //0~1 -> 3段階に
     
     if (isTextured == false)
     {
-    // return Id * diffuseColor * cos_alpha + Id * diffuseColor * ambentSource;
-        diffuse = diffuseColor * inData.cos_alpha * factor.x;
+        diffuse = diffuseColor * tUv * colA * factor.x;
         ambient = diffuseColor * ambentSource * factor.x;
     }
     else
     {
-    //return Id * Kd * cos_alpha + Id * Kd * ambentSource;
-        diffuse = g_texture.Sample(g_sampler, inData.uv) * inData.cos_alpha * factor.x;
-        ambient = g_texture.Sample(g_sampler, inData.uv) * ambentSource * factor.x;;
+        diffuse = g_texture.Sample(g_sampler, inData.uv) * tUv * colA * factor.x;
+        ambient = g_texture.Sample(g_sampler, inData.uv) * ambentSource * factor.x;
     }
     //return g_texture.Sample(g_sampler, myUv);
-    return diffuse + ambient + specular;
+    //return diffuse + ambient + specular;
+    return diffuse + ambient;
 }

@@ -61,6 +61,7 @@ class FBX
 	int polygonCount_;	//ポリゴン数
 	//int indexNum_;
 	int materialCount_;	//マテリアルの個数
+	Texture* pToonTex_;
 	void InitVertex(fbxsdk::FbxMesh* mesh);
 	void InitIndex(fbxsdk::FbxMesh* mesh);
 	void InitConstantBuffer();
@@ -70,6 +71,6 @@ public:
 	HRESULT Load(std::string fileName);
 	void    Draw(Transform& transform);
 	void    Release();
-	void	Update();//deletesiro
+	void	Update();//deleteしろ
 };
 
