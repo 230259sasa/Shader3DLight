@@ -265,7 +265,7 @@ void FBX::InitMaterial(fbxsdk::FbxNode* pNode)
 void FBX::Draw(Transform& transform)
 {
 	//Quadをアレンジ
-	Direct3D::SetShader(SHADER_TOON);
+	Direct3D::SetShader(SHADER_3D);
 	transform.Calculation();
 
 	//頂点バッファ、インデックスバッファ、コンスタントバッファをパイプラインにセット

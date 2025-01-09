@@ -103,7 +103,7 @@ float4 PS(VS_OUT inData) : SV_Target
     float4 n1 = float4(1.0f / 4.0f, 1.0f / 4.0f, 1.0f / 4.0f, 1);
     float4 n2 = float4(2.0f / 4.0f, 2.0f / 4.0f, 2.0f / 4.0f, 1);
     float4 n3 = float4(3.0f / 4.0f, 3.0f / 4.0f, 3.0f / 4.0f, 1);
-    float4 tI = 0.1f * step(n1, NL) + 0.3 * step(n2, NL) + 0.6 * step(n3, NL);
+    float4 tI = 0.1f * step(n1, NL) + 0.4 * step(n2, NL) + 0.8 * step(n3, NL);
     float2 uv = float2(tI.x, 0);
     float4 tUv = g_toon_texture.Sample(g_sampler, uv);
     
