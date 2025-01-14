@@ -87,10 +87,6 @@ void TestScene::Update()
 	//コンスタントバッファ
 	Direct3D::pContext->VSSetConstantBuffers(1, 1, &pConstantBuffer_);	//頂点シェーダー用	
 	Direct3D::pContext->PSSetConstantBuffers(1, 1, &pConstantBuffer_);	//ピクセルシェーダー
-
-	if (Input::IsKeyDown(DIK_P)) {
-		Model::ChangeShader();
-	}
 }
 
 void TestScene::Draw()

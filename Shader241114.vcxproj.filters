@@ -124,6 +124,9 @@
     <FxCompile Include="ToonShader.hlsl">
       <Filter>ソース ファイル\Engine</Filter>
     </FxCompile>
+    <FxCompile Include="OutLineShader.hlsl">
+      <Filter>ソース ファイル</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -99,13 +99,16 @@ float4 PS(VS_OUT inData) : SV_Target
     float3 k = { 0.1f, 0.1f, 0.1f };
     float colA = 1.0 / (k.x + k.y * len + k.z * len * len); // ‹——£Œ¸Š
     
-    float4 NL = saturate(dot(normalize(inData.normal.xyz), dir));
-    float4 n1 = float4(1.0f / 4.0f, 1.0f / 4.0f, 1.0f / 4.0f, 1);
-    float4 n2 = float4(2.0f / 4.0f, 2.0f / 4.0f, 2.0f / 4.0f, 1);
-    float4 n3 = float4(3.0f / 4.0f, 3.0f / 4.0f, 3.0f / 4.0f, 1);
-    float4 tI = 0.1f * step(n1, NL) + 0.4 * step(n2, NL) + 0.8 * step(n3, NL);
-    float2 uv = float2(tI.x, 0);
+    //float4 NL = saturate(dot(normalize(inData.normal.xyz), dir));
+    //float4 n1 = float4(1.0f / 4.0f, 1.0f / 4.0f, 1.0f / 4.0f, 1);
+    //float4 n2 = float4(2.0f / 4.0f, 2.0f / 4.0f, 2.0f / 4.0f, 1);
+    //float4 n3 = float4(3.0f / 4.0f, 3.0f / 4.0f, 3.0f / 4.0f, 1);
+    //float4 tI = 0.1f * step(n1, NL) + 0.4 * step(n2, NL) + 0.8 * step(n3, NL);
+    float NL = saturate(dot(inData.normal, normalize(lightVec)));
+    float2 uv = float2(NL, 0);
     float4 tUv = g_toon_texture.Sample(g_sampler, uv);
+    //float2 uv = (inData.cos_alpha.x, 0);
+    //float4 tUv = g_toon_texture.Sample(g_sampler, uv);
     
     //color -= color % (1.0f / 3.0f); //0~1 -> 3’iŠK‚É
     

@@ -71,6 +71,5 @@ public:
 	HRESULT Load(std::string fileName);
 	void    Draw(Transform& transform);
 	void    Release();
-	void	Update();//delete‚µ‚ë
 };
 

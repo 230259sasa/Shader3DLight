@@ -65,9 +65,3 @@ void Model::Release()
 	modelList.clear();
 }
 
-void Model::ChangeShader()
-{
-	for (auto itr : modelList) {
-		itr->pFbx_->Update();
-	}
-}
