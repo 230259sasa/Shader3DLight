@@ -2,6 +2,9 @@
 
 #include <d3d11.h>
 #include<DirectXMath.h>
+#include"../imgui/imgui.h"
+#include"../imgui/imgui_impl_dx11.h"
+#include"../imgui/imgui_impl_win32.h"
 
 enum SHADER_TYPE {
 	SHADER_2D,SHADER_3D,

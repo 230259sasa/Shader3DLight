@@ -1,6 +1,9 @@
 #pragma once
 #include "Engine\GameObject.h"
 #include "Engine\Texture.h"// ID3D11Buffer
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_dx11.h"
+#include "imgui/imgui_impl_win32.h"
 
 const int MAX_MODEL(5);
 

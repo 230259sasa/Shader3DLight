@@ -491,6 +491,10 @@ void Direct3D::BeginDraw()
 
 	//深度バッファクリア
 	pContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
 }
 
 //描画終了
@@ -499,6 +503,9 @@ void Direct3D::EndDraw()
 {
 	//スワップ（バックバッファを表に表示する）
 	pSwapChain->Present(0, 0);
+
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
 
 
@@ -515,6 +522,10 @@ void Direct3D::Release()
 	SAFE_RELEASE(pSwapChain);
 	SAFE_RELEASE(pContext);
 	SAFE_RELEASE(pDevice);
+
+	ImGui_ImplDX11_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
 }
 
 

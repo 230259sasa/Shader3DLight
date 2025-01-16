@@ -91,6 +91,10 @@ void TestScene::Update()
 
 void TestScene::Draw()
 {
+	{
+		//ImGui::ShowDemoWindow();
+		ImGui::Text("This is My Original Shader");
+	}
 	Transform t;
 	t = transform_;
 	float xpos = t.position_.x - 4;
@@ -110,6 +114,7 @@ void TestScene::Draw()
 	t.rotate_.y = 0;
 	Model::SetTransform(hModel_[2], t);
 	Model::Draw(hModel_[2]);*/
+	
 }
 
 void TestScene::Release()
