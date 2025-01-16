@@ -501,11 +501,11 @@ void Direct3D::BeginDraw()
 
 void Direct3D::EndDraw()
 {
-	//スワップ（バックバッファを表に表示する）
-	pSwapChain->Present(0, 0);
-
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+	//スワップ（バックバッファを表に表示する）
+	pSwapChain->Present(0, 0);
 }
 
 
