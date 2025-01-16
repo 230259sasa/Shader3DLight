@@ -17,6 +17,7 @@ class TestScene :
 {
     ID3D11Buffer* pConstantBuffer_;
     int hModel_[MAX_MODEL];
+    bool isRotate_;
     void InitConstantBuffer();
 public:
     TestScene(GameObject* parent);

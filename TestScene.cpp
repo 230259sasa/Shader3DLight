@@ -42,7 +42,8 @@ void TestScene::Initialize()
 
 void TestScene::Update()
 {
-	transform_.rotate_.y += 0.5;
+	if(isRotate_)
+	transform_.rotate_.y += 1;
 	if (Input::IsKey(DIK_A)) {
 		XMFLOAT4 p = Direct3D::GetGlobalLightVec();
 		p.x -= 0.1;
@@ -91,10 +92,6 @@ void TestScene::Update()
 
 void TestScene::Draw()
 {
-	{
-		//ImGui::ShowDemoWindow();
-		ImGui::Text("This is My Original Shader");
-	}
 	Transform t;
 	t = transform_;
 	float xpos = t.position_.x - 4;
@@ -114,7 +111,26 @@ void TestScene::Draw()
 	t.rotate_.y = 0;
 	Model::SetTransform(hModel_[2], t);
 	Model::Draw(hModel_[2]);*/
-	
+
+	{
+		//ImGui::ShowDemoWindow();
+		ImGui::Text("This is My Original Shader");
+		ImGui::Text("Model rotate => %5.3lf",transform_.rotate_.y);
+		ImGui::Checkbox("Rotate", &isRotate_);
+		if (ImGui::Button("Rotate Light")) {
+			isRotate_ = !isRotate_;
+		}
+		//ImGui::InputText("input:", text.data(), 255);
+		//ImGui::Text(text.c_str);
+		float pos[3] = { 0,0,0 };
+		if (ImGui::InputFloat3("Position", pos, "%3f")) {
+			transform_.position_ = { pos[0],pos[1],pos[2] };
+		}
+		static float scl(0);
+		if(ImGui::SliderFloat("scale", &scl, 0.01, 2, "%.3f")) {
+			transform_.scale_ = { scl,scl,scl };
+		}
+	}
 }
 
 void TestScene::Release()
