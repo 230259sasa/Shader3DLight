@@ -284,7 +284,8 @@ void FBX::Draw(Transform& transform)
 			cb.ambientColor = pMaterialList_[i].ambient;
 			cb.specularColor = pMaterialList_[i].specular;
 			cb.shininess = pMaterialList_[i].shininess;
-			cb.isTextured = (pMaterialList_[i].pTexture != nullptr);
+			int val = (int)(pMaterialList_[i].pTexture != nullptr);
+			cb.isTextured = { val,val,val,val };
 			/*if (pMaterialList_[i].pTexture == nullptr) {
 				cb.isTextured = false;
 			}
