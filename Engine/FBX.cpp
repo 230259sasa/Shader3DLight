@@ -69,6 +69,9 @@ void FBX::InitVertex(fbxsdk::FbxMesh* mesh)
 	//頂点情報を入れる配列
 	//VERTEX* vertices = new VERTEX[vertexCount_];
 	std::vector<VERTEX> vertices(vertexCount_);
+
+	//int nNum = mesh->GetElementNormalCount();
+	//int tNum = mesh->GetElementTangentCount();
 	//全ポリゴン
 	for (DWORD poly = 0; poly < polygonCount_; poly++)
 	{
@@ -94,6 +97,20 @@ void FBX::InitVertex(fbxsdk::FbxMesh* mesh)
 			vertices[index].normal = XMVectorSet((float)Normal[0], (float)Normal[1], -(float)Normal[2], 0.0f);
 		}
 	}
+	//タンジェント情報の取得
+	FbxGeometryElementTangent* t = mesh->GetElementTangent(0);
+	for (DWORD poly = 0; poly < polygonCount_; poly++) {
+		FbxVector4 tangent(0, 0, 0, 0);
+		int index = mesh->GetPolygonVertexIndex(poly);
+		if (t != nullptr) {
+			tangent = t->GetDirectArray().GetAt(index).mData;
+		}
+		for (int i = 0; i < 3; i++) {
+			int rIndex = mesh->GetPolygonVertices()[index + i];
+			vertices[rIndex].tangent = XMVectorSet((float)tangent[0], (float)tangent[1], (float)tangent[2], 0.0f);
+		}
+	}
+
 	// 頂点バッファ作成
 	//（自分でやって）
 	//頂点バッファ
@@ -265,11 +282,8 @@ void FBX::InitMaterial(fbxsdk::FbxNode* pNode)
 void FBX::Draw(Transform& transform)
 {
 	//Quadをアレンジ
-	Direct3D::SetShader(SHADER_OUTLINE);
+	Direct3D::SetShader(SHADER_NORMALMAP);
 	transform.Calculation();
-
-	
-
 
 	// インデックスバッファーをセット
 	for (int j = 0; j < 2; j++) {
