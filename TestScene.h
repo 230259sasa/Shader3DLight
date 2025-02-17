@@ -5,7 +5,7 @@
 #include "imgui/imgui_impl_dx11.h"
 #include "imgui/imgui_impl_win32.h"
 
-const int MAX_MODEL(5);
+const int MAX_MODEL(2);
 
 struct CONSTBUFFER_STAGE {
     XMFLOAT4 lightPosition;//ŒõŒ¹ˆÊ’u

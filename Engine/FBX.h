@@ -53,7 +53,7 @@ class FBX
 		XMVECTOR tangent;//接線ベクトル
 	};
 
-	RENDER_STATE state_;
+	//RENDER_STATE state_;
 
 	ID3D11Buffer* pVertexBuffer_;//頂点バッファ用メモリ
 	ID3D11Buffer** pIndexBuffer_;//インデックスバッファ用メモリ

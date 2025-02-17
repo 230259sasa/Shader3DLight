@@ -31,11 +31,11 @@ TestScene::TestScene(GameObject* parent)
 
 void TestScene::Initialize()
 {
-	hModel_[0] = Model::Load("Assets/phon.fbx");
-	hModel_[1] = Model::Load("Assets/notphon.fbx");
-	hModel_[2] = Model::Load("Assets/nottexphon.fbx");
+	hModel_[0] = Model::Load("Assets/trus/Torus.fbx");
+	hModel_[1] = Model::Load("Assets/pp.fbx");
+	/*hModel_[2] = Model::Load("Assets/nottexphon.fbx");
 	hModel_[3] = Model::Load("Assets/nottexnotphon.fbx");
-	hModel_[4] = Model::Load("Assets/pp.fbx");
+	hModel_[4] = Model::Load("Assets/pp.fbx");*/
 
 	InitConstantBuffer();
 }
@@ -94,9 +94,8 @@ void TestScene::Draw()
 {
 	Transform t;
 	t = transform_;
-	float xpos = t.position_.x - 4;
 	for (int i = 0; i < MAX_MODEL-1; i++) {
-		t.position_.x = 2.5 * i + xpos;
+		//t.position_.x = 2.5 * i;
 		Model::SetTransform(hModel_[i], t);
 		Model::Draw(hModel_[i]);
 	}

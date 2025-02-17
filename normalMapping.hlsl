@@ -4,8 +4,6 @@
 Texture2D g_texture : register(t0); //テクスチャー
 SamplerState g_sampler : register(s0); //サンプラー
 
-Texture2D g_toon_texture : register(t1); //テクスチャー
-SamplerState g_toon_sampler : register(s1); //サンプラー
 //───────────────────────────────────────
  // コンスタントバッファ
 // DirectX 側から送信されてくる、ポリゴン頂点以外の諸情報の定義
@@ -23,7 +21,6 @@ cbuffer global : register(b0)
     float4 specularColor;
     float4 shininess;
     bool isTextured; //texが貼られているか
-    bool isNormalMapped;//法線マップ
 };
 
 cbuffer gStage : register(b1)
@@ -31,7 +28,6 @@ cbuffer gStage : register(b1)
     float4 lightVec;
     float4 eyePosition;
 };
-
 
 //───────────────────────────────────────
 // 頂点シェーダー出力＆ピクセルシェーダー入力データ構造体
@@ -41,7 +37,7 @@ struct VS_OUT
     float4 wpos : POSITION0;
     float4 pos : SV_POSITION; //位置
     float2 uv : TEXCOORD; //UV座標
-    float4 cos_alpha : COLOR; //色（明るさ）
+    //float4 color : COLOR; //色（明るさ）
     float4 normal : NORMAL;
     float4 eyev : POSITION1;
 };
@@ -56,24 +52,20 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
 
 	//ローカル座標に、ワールド・ビュー・プロジェクション行列をかけて
 	//スクリーン座標に変換し、ピクセルシェーダーへ
+    
     outData.pos = mul(pos, matWVP);
     outData.wpos = mul(pos, matW);
+    outData.normal = mul(normal, matNormal);
     outData.uv = uv;
+    outData.eyev = eyePosition - mul(pos, matW);
+    //outData.normal = wnormal;
     
     //float4 light = float4(1, 1, -1, 0); //光源ベクトルの逆ベクトル
-    float4 light = lightVec;
-    light = normalize(light); //単位ベクトル化
-
-    normal = mul(normal, matNormal);
-    outData.normal = normal;
-   // normal = normalize(normal);
-   // normal.w = 0;
-   //light.w = 0;
     
-    outData.cos_alpha = clamp(dot(normal, light), 0, 1);
-    //outData.cos_alpha = saturate(dot(normalize(normal), 0));
-    outData.eyev = eyePosition - mul(pos, matW);
+    //float4 light = normalize(lightVec - wos); //単位ベクトル化
     
+    //outData.color = clamp(dot(normalize(wnormal), -light), 0, 1);
+    //outData.color = normal;
 	//まとめて出力
     return outData;
 }
@@ -83,32 +75,32 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
 //───────────────────────────────────────
 float4 PS(VS_OUT inData) : SV_Target
 {
-    //return float4(65 / 255.0, 105 / 255.0, 225 / 255.0, 1); //ピクセルを塗る色
-    //float4 myUv = { 0.125, 0.25, 0, 0 };
-    //float4 Id = { 1.0, 1.0, 1.0, 0.0 };
-    //float4 Kd = g_texture.Sample(g_sampler, inData.uv);
-    //float cos_alpha = inData.cos_alpha;
-    float4 ambentSource = { 0.7, 0.7, 0.7, 1.0 }; //環境光の強さ
+    float4 light = lightVec;
+    float4 ambentSource = { 0.3, 0.3, 0.3, 1.0 }; //環境光の強さ
     float4 diffuse;
     float4 ambient;
+    float3 dir = normalize(light.xyz - inData.wpos.xyz); //ピクセル位置のポリゴンの3次元座標 wpos
+    //inData.normal.z = 0;
+    float color = saturate(dot(normalize(inData.normal.xyz), dir));
+    float len = length(light.xyz - inData.wpos.xyz);
+    float3 k = { 0.1f, 0.1f, 0.1f };
+    float colA = 1.0 / (k.x + k.y * len + k.z * len * len);
     
-    float3 dir = normalize(lightVec.xyz - inData.wpos.xyz);
+    
     float4 r = reflect(normalize(inData.normal), normalize(float4(-dir, 1)));
     float4 specular = pow(saturate(dot(r, normalize(inData.eyev))), shininess) * specularColor;
-    float tI = g_toon_texture.Sample(g_sampler, inData.uv);
+
     
     if (isTextured == false)
     {
-       // return Id * diffuseColor * cos_alpha + Id * diffuseColor * ambentSource;
-        diffuse = diffuseColor * inData.cos_alpha * factor.x;
-        ambient = diffuseColor * ambentSource * factor.x;
+        diffuse = diffuseColor * color * colA * factor.x;
+        ambient = diffuseColor * ambentSource * factor.x;;
     }
     else
     {
-        //return Id * Kd * cos_alpha + Id * Kd * ambentSource;
-        diffuse = g_texture.Sample(g_sampler, inData.uv) * inData.cos_alpha * factor.x;
-        ambient = g_texture.Sample(g_sampler, inData.uv) * ambentSource * factor.x;
+        diffuse = g_texture.Sample(g_sampler, inData.uv) * color * colA * factor.x;
+        ambient = g_texture.Sample(g_sampler, inData.uv) * ambentSource * factor.x;;
     }
-    //return g_texture.Sample(g_sampler, myUv);
+    
     return diffuse + ambient + specular;
 }
