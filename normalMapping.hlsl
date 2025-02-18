@@ -3,6 +3,7 @@
 //───────────────────────────────────────
 Texture2D g_texture : register(t0); //テクスチャー
 SamplerState g_sampler : register(s0); //サンプラー
+Texture2D g_nTexture : register(t1);
 
 //───────────────────────────────────────
  // コンスタントバッファ
@@ -21,6 +22,7 @@ cbuffer global : register(b0)
     float4 specularColor;
     float4 shininess;
     bool isTextured; //texが貼られているか
+    bool isNormalMapped;
 };
 
 cbuffer gStage : register(b1)
@@ -34,18 +36,20 @@ cbuffer gStage : register(b1)
 //───────────────────────────────────────
 struct VS_OUT
 {
-    float4 wpos : POSITION0;
     float4 pos : SV_POSITION; //位置
+    float4 wpos : POSITION0;
     float2 uv : TEXCOORD; //UV座標
-    //float4 color : COLOR; //色（明るさ）
+    float4 cos_alpha : COLOR; //色（明るさ）
     float4 normal : NORMAL;
     float4 eyev : POSITION1;
+    float4 Neyev : POSITION2; //ノーマルマップ用の接空間に変換された視線ベクトル
+    float4 light : POSITION3;
 };
 
 //───────────────────────────────────────
 // 頂点シェーダ
 //───────────────────────────────────────
-VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
+VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL, float4 tangent : TANGENT)
 {
 	//ピクセルシェーダーへ渡す情報
     VS_OUT outData;
@@ -55,17 +59,37 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
     
     outData.pos = mul(pos, matWVP);
     outData.wpos = mul(pos, matW);
-    outData.normal = mul(normal, matNormal);
-    outData.uv = uv;
-    outData.eyev = eyePosition - mul(pos, matW);
-    //outData.normal = wnormal;
+    outData.uv = uv.xy;
+    //接戦、法線、従法線
+    float3 tmp = cross(tangent.xyz, normal.xyz);
+    float4 binormal = mul(tmp, matNormal);
+    binormal = normalize(binormal);
+    normal = mul(normal, matNormal);
+    normal.w = 0;
+    outData.normal = normalize(normal);
+    tangent = mul(tangent, matNormal);
+    tangent.w = 0;
+    tangent = normalize(tangent);
     
-    //float4 light = float4(1, 1, -1, 0); //光源ベクトルの逆ベクトル
+    //視線ベクトル(ワールド座標)
+    float4 posw = mul(pos, matW);
+    outData.eyev = normalize(posw - eyePosition);
     
-    //float4 light = normalize(lightVec - wos); //単位ベクトル化
+    //視線ベクトルを接空間に変換
+    outData.Neyev.x = dot(outData.eyev,tangent);
+    outData.Neyev.y = dot(outData.eyev,binormal);
+    outData.Neyev.z = dot(outData.eyev,normal);
+    outData.Neyev.w = 0;
     
-    //outData.color = clamp(dot(normalize(wnormal), -light), 0, 1);
-    //outData.color = normal;
+    float4 light = lightVec;
+    light.w = 0;
+    light = normalize(light);
+    outData.light.x = mul(light,tangent);
+    outData.light.y = mul(light,binormal);
+    outData.light.z = mul(light,normal);
+    outData.light.w = 0;
+    
+    outData.cos_alpha = clamp(dot(outData.normal, light), 0, 1);
 	//まとめて出力
     return outData;
 }
@@ -75,31 +99,52 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
 //───────────────────────────────────────
 float4 PS(VS_OUT inData) : SV_Target
 {
-    float4 light = lightVec;
-    float4 ambentSource = { 0.3, 0.3, 0.3, 1.0 }; //環境光の強さ
+    float4 lightSource = { 1.0, 1.0, 1.0, 1.0 };
+    float4 ambentSource = { 0.9, 0.9, 0.9, 1.0 }; //環境光の強さ
     float4 diffuse;
     float4 ambient;
+    
+    float4 light = lightVec;
     float3 dir = normalize(light.xyz - inData.wpos.xyz); //ピクセル位置のポリゴンの3次元座標 wpos
-    //inData.normal.z = 0;
     float color = saturate(dot(normalize(inData.normal.xyz), dir));
     float len = length(light.xyz - inData.wpos.xyz);
     float3 k = { 0.1f, 0.1f, 0.1f };
-    float colA = 1.0 / (k.x + k.y * len + k.z * len * len);
-    
-    
+    float colA = 1.0 / (k.x + k.y * len + k.z * len * len); // 距離減衰
     float4 r = reflect(normalize(inData.normal), normalize(float4(-dir, 1)));
     float4 specular = pow(saturate(dot(r, normalize(inData.eyev))), shininess) * specularColor;
-
     
-    if (isTextured == false)
+    if (isNormalMapped)
     {
-        diffuse = diffuseColor * color * colA * factor.x;
-        ambient = diffuseColor * ambentSource * factor.x;;
+        float4 nmap = g_nTexture.Sample(g_sampler, inData.uv)*2.0f - 1.0f;
+        nmap = normalize(nmap);
+        nmap.w = 0;
+        float4 NL = clamp(dot(normalize(inData.light),nmap),0, 1);
+        
+        if (isTextured == false)
+        {
+            diffuse = diffuseColor * NL * factor.x;
+            ambient = diffuseColor * ambentSource * factor.x;
+        }
+        else
+        {
+            diffuse = g_texture.Sample(g_sampler, inData.uv) * NL * factor.x;
+            ambient = g_texture.Sample(g_sampler, inData.uv) * ambentSource * factor.x;
+        }
+        return diffuse + ambient;
     }
     else
     {
-        diffuse = g_texture.Sample(g_sampler, inData.uv) * color * colA * factor.x;
-        ambient = g_texture.Sample(g_sampler, inData.uv) * ambentSource * factor.x;;
+        if (isTextured == false)
+        {
+            diffuse = diffuseColor * inData.cos_alpha * factor.x;
+            ambient = diffuseColor * ambentSource * factor.x;
+        }
+        else
+        {
+            diffuse = g_texture.Sample(g_sampler, inData.uv) * inData.cos_alpha * factor.x;
+            ambient = g_texture.Sample(g_sampler, inData.uv) * ambentSource * factor.x;
+        }
+        return diffuse + ambient + specular;
     }
     
     return diffuse + ambient + specular;

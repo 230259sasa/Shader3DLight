@@ -31,7 +31,7 @@ TestScene::TestScene(GameObject* parent)
 
 void TestScene::Initialize()
 {
-	hModel_[0] = Model::Load("Assets/trus/Torus.fbx");
+	hModel_[0] = Model::Load("Assets/trus/Torus1.fbx");
 	hModel_[1] = Model::Load("Assets/pp.fbx");
 	/*hModel_[2] = Model::Load("Assets/nottexphon.fbx");
 	hModel_[3] = Model::Load("Assets/nottexnotphon.fbx");

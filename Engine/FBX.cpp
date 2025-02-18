@@ -329,7 +329,7 @@ void FBX::InitMaterial(fbxsdk::FbxNode* pNode)
 				if (fs::is_regular_file(filename))
 				{
 					pMaterialList_[i].pNormalMap = new Texture;
-					HRESULT hr = pMaterialList_[i].pTexture->Load(filename.string());
+					HRESULT hr = pMaterialList_[i].pNormalMap->Load(filename.string());
 					assert(hr == S_OK);
 				}
 			}
