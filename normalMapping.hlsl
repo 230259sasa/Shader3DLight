@@ -73,7 +73,7 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL, f
     
     //視線ベクトル(ワールド座標)
     float4 posw = mul(pos, matW);
-    outData.eyev = normalize(posw - eyePosition);
+    outData.eyev = float4(normalize(posw.xyz - eyePosition.xyz), 0);
     
     //視線ベクトルを接空間に変換
     outData.Neyev.x = dot(outData.eyev,tangent);
