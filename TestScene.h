@@ -12,6 +12,8 @@ struct CONSTBUFFER_STAGE {
     XMFLOAT4 eyePosition;//Ž‹“_ˆÊ’u
 };
 
+class Sprite;
+
 class TestScene :
     public GameObject
 {
@@ -19,6 +21,7 @@ class TestScene :
     int hModel_[MAX_MODEL];
     bool isRotate_;
     void InitConstantBuffer();
+    Sprite* tex_;
 public:
     TestScene(GameObject* parent);
     void Initialize() override;

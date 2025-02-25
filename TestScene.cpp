@@ -4,6 +4,7 @@
 #include"Engine\Model.h"
 #include"Engine\Direct3D.h"
 #include"Engine\Camera.h"
+#include"Engine\Sprite.h"
 
 void TestScene::InitConstantBuffer()
 {
@@ -22,6 +23,9 @@ void TestScene::InitConstantBuffer()
 	{
 		MessageBox(NULL, L"コンスタントバッファの作成に失敗しました", L"エラー", MB_OK);
 	}
+
+	tex_ = new Sprite("Assets/wood_floor_worn_diff_1k.jpg");
+	tex_->Initialize();
 }
 
 TestScene::TestScene(GameObject* parent)
@@ -92,44 +96,45 @@ void TestScene::Update()
 
 void TestScene::Draw()
 {
-	Transform t;
-	t = transform_;
-	for (int i = 0; i < MAX_MODEL-1; i++) {
-		//t.position_.x = 2.5 * i;
-		Model::SetTransform(hModel_[i], t);
-		Model::Draw(hModel_[i]);
-	}
-	t.position_.x = Direct3D::GetGlobalLightVec().x;
-	t.position_.y = Direct3D::GetGlobalLightVec().y;
-	t.position_.z = Direct3D::GetGlobalLightVec().z;
-	t.scale_ = { 0.5,0.5,0.5 };
-	Model::SetTransform(hModel_[MAX_MODEL-1], t);
-	Model::Draw(hModel_[MAX_MODEL-1]);
-	/*t.position_.x = 0;
-	t.position_.y = -1;
-	t.rotate_.y = 0;
-	Model::SetTransform(hModel_[2], t);
-	Model::Draw(hModel_[2]);*/
+	tex_->Draw(transform_);
+	//Transform t;
+	//t = transform_;
+	//for (int i = 0; i < MAX_MODEL-1; i++) {
+	//	//t.position_.x = 2.5 * i;
+	//	Model::SetTransform(hModel_[i], t);
+	//	Model::Draw(hModel_[i]);
+	//}
+	//t.position_.x = Direct3D::GetGlobalLightVec().x;
+	//t.position_.y = Direct3D::GetGlobalLightVec().y;
+	//t.position_.z = Direct3D::GetGlobalLightVec().z;
+	//t.scale_ = { 0.5,0.5,0.5 };
+	//Model::SetTransform(hModel_[MAX_MODEL-1], t);
+	//Model::Draw(hModel_[MAX_MODEL-1]);
+	///*t.position_.x = 0;
+	//t.position_.y = -1;
+	//t.rotate_.y = 0;
+	//Model::SetTransform(hModel_[2], t);
+	//Model::Draw(hModel_[2]);*/
 
-	{
-		//ImGui::ShowDemoWindow();
-		ImGui::Text("This is My Original Shader");
-		ImGui::Text("Model rotate => %5.3lf",transform_.rotate_.y);
-		ImGui::Checkbox("Rotate", &isRotate_);
-		if (ImGui::Button("Rotate Light")) {
-			isRotate_ = !isRotate_;
-		}
-		//ImGui::InputText("input:", text.data(), 255);
-		//ImGui::Text(text.c_str);
-		float pos[3] = { 0,0,0 };
-		if (ImGui::InputFloat3("Position", pos, "%3f")) {
-			transform_.position_ = { pos[0],pos[1],pos[2] };
-		}
-		static float scl(0);
-		if(ImGui::SliderFloat("scale", &scl, 0.01, 2, "%.3f")) {
-			transform_.scale_ = { scl,scl,scl };
-		}
-	}
+	//{
+	//	//ImGui::ShowDemoWindow();
+	//	ImGui::Text("This is My Original Shader");
+	//	ImGui::Text("Model rotate => %5.3lf",transform_.rotate_.y);
+	//	ImGui::Checkbox("Rotate", &isRotate_);
+	//	if (ImGui::Button("Rotate Light")) {
+	//		isRotate_ = !isRotate_;
+	//	}
+	//	//ImGui::InputText("input:", text.data(), 255);
+	//	//ImGui::Text(text.c_str);
+	//	float pos[3] = { 0,0,0 };
+	//	if (ImGui::InputFloat3("Position", pos, "%3f")) {
+	//		transform_.position_ = { pos[0],pos[1],pos[2] };
+	//	}
+	//	static float scl(0);
+	//	if(ImGui::SliderFloat("scale", &scl, 0.01, 2, "%.3f")) {
+	//		transform_.scale_ = { scl,scl,scl };
+	//	}
+	//}
 }
 
 void TestScene::Release()
